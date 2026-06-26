@@ -28,7 +28,7 @@ export interface Agent {
   emergencyContact: string;
 }
 
-const FIRST = ["Aarav", "Vivaan", "Aditya", "Vihaan", "Arjun", "Sai", "Reyansh", "Krishna", "Ishaan", "Rohan", "Priya", "Ananya", "Diya", "Aanya", "Pari", "Kavya", "Riya", "Sara", "Myra", "Aadhya"];
+const FIRST = ["Aarav", "Vivaan", "Aditya", "Vihaan", "Arjun", "Sai"];
 const LAST = ["Sharma", "Verma", "Patel", "Reddy", "Iyer", "Singh", "Kumar", "Gupta", "Nair", "Mehta", "Joshi", "Rao", "Khan", "Chopra", "Malhotra"];
 const DESIGNATIONS = ["Field Executive", "Medical Rep", "Sales Officer", "Area Manager", "Territory Lead"];
 const DEPARTMENTS = ["Sales", "Marketing", "Field Ops", "Medical"];
@@ -58,7 +58,7 @@ function seeded(seed: number) {
 const rng = seeded(42);
 const pick = <T,>(arr: T[]) => arr[Math.floor(rng() * arr.length)]!;
 
-export const AGENTS: Agent[] = Array.from({ length: 36 }, (_, i) => {
+export const AGENTS: Agent[] = Array.from({ length: 8 }, (_, i) => {
   const first = pick(FIRST);
   const last = pick(LAST);
   const name = `${first} ${last}`;
@@ -99,7 +99,7 @@ export const HOSPITALS = [
   "AIIMS", "Narayana Health", "Medanta", "Kokilaben Hospital", "Lilavati Hospital",
 ];
 
-export const DOCTORS = Array.from({ length: 24 }, (_, i) => ({
+export const DOCTORS = Array.from({ length: 8 }, (_, i) => ({
   id: `doc-${i}`,
   name: `Dr. ${pick(FIRST)} ${pick(LAST)}`,
   specialization: pick(["Cardiology", "Orthopedics", "Pediatrics", "Neurology", "Oncology", "General Medicine", "ENT", "Dermatology"]),
@@ -111,7 +111,7 @@ export const DOCTORS = Array.from({ length: 24 }, (_, i) => ({
   nextFollowup: `2026-07-${1 + (i % 28)}`,
 }));
 
-export const PATIENTS = Array.from({ length: 30 }, (_, i) => ({
+export const PATIENTS = Array.from({ length: 8 }, (_, i) => ({
   id: `pat-${i}`,
   name: `${pick(FIRST)} ${pick(LAST)}`,
   age: 18 + Math.floor(rng() * 70),
@@ -124,7 +124,7 @@ export const PATIENTS = Array.from({ length: 30 }, (_, i) => ({
   status: pick(["Follow-up", "Completed", "Pending"]),
 }));
 
-export const HOSPITAL_VISITS = Array.from({ length: 20 }, (_, i) => ({
+export const HOSPITAL_VISITS = Array.from({ length: 6 }, (_, i) => ({
   id: `hv-${i}`,
   hospital: pick(HOSPITALS),
   type: pick(["Multi-specialty", "Clinic", "Government", "Specialty"]),
@@ -145,7 +145,7 @@ export const RECENT_ACTIVITIES = [
   { id: 6, agent: "Diya Khan", action: "started journey to Manipal Hospital", time: "1 hr ago", type: "travel" },
 ];
 
-export const TRAVEL_REPORTS = AGENTS.slice(0, 18).map((a, i) => ({
+export const TRAVEL_REPORTS = AGENTS.slice(0, 8).map((a, i) => ({
   id: `tr-${i}`,
   agent: a.name,
   employeeId: a.employeeId,

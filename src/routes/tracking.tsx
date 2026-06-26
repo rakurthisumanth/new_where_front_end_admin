@@ -42,31 +42,6 @@ function LiveTracking() {
     <div className="grid h-[calc(100vh-4rem)] grid-cols-1 gap-0 md:grid-cols-[360px_1fr]">
       <aside className="flex flex-col overflow-hidden border-r bg-card">
         <div className="space-y-2 border-b p-3">
-          <div className="relative">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input placeholder="Search agents…" value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
-          </div>
-          <div className="grid grid-cols-2 gap-2">
-            <Select value={org} onValueChange={setOrg}>
-              <SelectTrigger><SelectValue placeholder="Org" /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Orgs</SelectItem>
-                <SelectItem value="MediCorp Pharma">MediCorp</SelectItem>
-                <SelectItem value="HealthBridge Ltd">HealthBridge</SelectItem>
-                <SelectItem value="ZenoCare">ZenoCare</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={status} onValueChange={setStatus}>
-              <SelectTrigger><SelectValue placeholder="Status" /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="checked_in">Checked In</SelectItem>
-                <SelectItem value="moving">Moving</SelectItem>
-                <SelectItem value="idle">Idle</SelectItem>
-                <SelectItem value="offline">Offline</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
         </div>
         <div className="flex-1 overflow-y-auto">
           {filtered.map((a) => (

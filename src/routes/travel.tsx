@@ -20,18 +20,11 @@ function TravelPage() {
   type Row = typeof TRAVEL_REPORTS[number];
   const cols: Column<Row>[] = [
     { key: "agent", header: "Employee", sortable: true },
-    { key: "date", header: "Date", sortable: true },
-    { key: "checkIn", header: "Check In" },
-    { key: "checkOut", header: "Check Out" },
     { key: "distance", header: "Distance", sortable: true, render: (r) => `${r.distance} km` },
     { key: "travelTime", header: "Travel Time" },
     { key: "hospitals", header: "Hospitals" },
-    { key: "doctors", header: "Doctors" },
-    { key: "patients", header: "Patients" },
-    { key: "avgSpeed", header: "Avg Speed", render: (r) => `${r.avgSpeed} km/h` },
-    { key: "stops", header: "Stops" },
-    {
-      key: "actions", header: "",
+      {
+      key: "actions", header: "Actions",
       render: () => <Button size="sm" variant="ghost"><Eye className="mr-1 h-4 w-4" />View</Button>,
     },
   ];
@@ -54,18 +47,6 @@ function TravelPage() {
         <CardContent className="grid gap-3 p-4 md:grid-cols-3 lg:grid-cols-6">
           <div className="space-y-1"><label className="text-xs text-muted-foreground">From Date</label><Input type="date" /></div>
           <div className="space-y-1"><label className="text-xs text-muted-foreground">To Date</label><Input type="date" /></div>
-          <div className="space-y-1">
-            <label className="text-xs text-muted-foreground">Organization</label>
-            <Select><SelectTrigger><SelectValue placeholder="All" /></SelectTrigger><SelectContent><SelectItem value="all">All</SelectItem></SelectContent></Select>
-          </div>
-          <div className="space-y-1">
-            <label className="text-xs text-muted-foreground">Manager</label>
-            <Select><SelectTrigger><SelectValue placeholder="All" /></SelectTrigger><SelectContent><SelectItem value="all">All</SelectItem></SelectContent></Select>
-          </div>
-          <div className="space-y-1">
-            <label className="text-xs text-muted-foreground">Department</label>
-            <Select><SelectTrigger><SelectValue placeholder="All" /></SelectTrigger><SelectContent><SelectItem value="all">All</SelectItem></SelectContent></Select>
-          </div>
           <div className="space-y-1">
             <label className="text-xs text-muted-foreground">Search Agent</label>
             <Input placeholder="Search…" value={search} onChange={(e) => setSearch(e.target.value)} />

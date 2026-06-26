@@ -11,13 +11,6 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TravelRouteImport } from './routes/travel'
 import { Route as TrackingRouteImport } from './routes/tracking'
-import { Route as SettingsRouteImport } from './routes/settings'
-import { Route as ReportsRouteImport } from './routes/reports'
-import { Route as PatientsRouteImport } from './routes/patients'
-import { Route as HospitalsRouteImport } from './routes/hospitals'
-import { Route as DoctorsRouteImport } from './routes/doctors'
-import { Route as AttendanceRouteImport } from './routes/attendance'
-import { Route as AnalyticsRouteImport } from './routes/analytics'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AgentsIndexRouteImport } from './routes/agents.index'
 import { Route as AgentsNewRouteImport } from './routes/agents.new'
@@ -31,41 +24,6 @@ const TravelRoute = TravelRouteImport.update({
 const TrackingRoute = TrackingRouteImport.update({
   id: '/tracking',
   path: '/tracking',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SettingsRoute = SettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ReportsRoute = ReportsRouteImport.update({
-  id: '/reports',
-  path: '/reports',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PatientsRoute = PatientsRouteImport.update({
-  id: '/patients',
-  path: '/patients',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const HospitalsRoute = HospitalsRouteImport.update({
-  id: '/hospitals',
-  path: '/hospitals',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DoctorsRoute = DoctorsRouteImport.update({
-  id: '/doctors',
-  path: '/doctors',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AttendanceRoute = AttendanceRouteImport.update({
-  id: '/attendance',
-  path: '/attendance',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AnalyticsRoute = AnalyticsRouteImport.update({
-  id: '/analytics',
-  path: '/analytics',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -91,13 +49,6 @@ const AgentsIdRoute = AgentsIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/analytics': typeof AnalyticsRoute
-  '/attendance': typeof AttendanceRoute
-  '/doctors': typeof DoctorsRoute
-  '/hospitals': typeof HospitalsRoute
-  '/patients': typeof PatientsRoute
-  '/reports': typeof ReportsRoute
-  '/settings': typeof SettingsRoute
   '/tracking': typeof TrackingRoute
   '/travel': typeof TravelRoute
   '/agents/$id': typeof AgentsIdRoute
@@ -106,13 +57,6 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/analytics': typeof AnalyticsRoute
-  '/attendance': typeof AttendanceRoute
-  '/doctors': typeof DoctorsRoute
-  '/hospitals': typeof HospitalsRoute
-  '/patients': typeof PatientsRoute
-  '/reports': typeof ReportsRoute
-  '/settings': typeof SettingsRoute
   '/tracking': typeof TrackingRoute
   '/travel': typeof TravelRoute
   '/agents/$id': typeof AgentsIdRoute
@@ -122,13 +66,6 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/analytics': typeof AnalyticsRoute
-  '/attendance': typeof AttendanceRoute
-  '/doctors': typeof DoctorsRoute
-  '/hospitals': typeof HospitalsRoute
-  '/patients': typeof PatientsRoute
-  '/reports': typeof ReportsRoute
-  '/settings': typeof SettingsRoute
   '/tracking': typeof TrackingRoute
   '/travel': typeof TravelRoute
   '/agents/$id': typeof AgentsIdRoute
@@ -139,43 +76,16 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/analytics'
-    | '/attendance'
-    | '/doctors'
-    | '/hospitals'
-    | '/patients'
-    | '/reports'
-    | '/settings'
     | '/tracking'
     | '/travel'
     | '/agents/$id'
     | '/agents/new'
     | '/agents/'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/analytics'
-    | '/attendance'
-    | '/doctors'
-    | '/hospitals'
-    | '/patients'
-    | '/reports'
-    | '/settings'
-    | '/tracking'
-    | '/travel'
-    | '/agents/$id'
-    | '/agents/new'
-    | '/agents'
+  to: '/' | '/tracking' | '/travel' | '/agents/$id' | '/agents/new' | '/agents'
   id:
     | '__root__'
     | '/'
-    | '/analytics'
-    | '/attendance'
-    | '/doctors'
-    | '/hospitals'
-    | '/patients'
-    | '/reports'
-    | '/settings'
     | '/tracking'
     | '/travel'
     | '/agents/$id'
@@ -185,13 +95,6 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AnalyticsRoute: typeof AnalyticsRoute
-  AttendanceRoute: typeof AttendanceRoute
-  DoctorsRoute: typeof DoctorsRoute
-  HospitalsRoute: typeof HospitalsRoute
-  PatientsRoute: typeof PatientsRoute
-  ReportsRoute: typeof ReportsRoute
-  SettingsRoute: typeof SettingsRoute
   TrackingRoute: typeof TrackingRoute
   TravelRoute: typeof TravelRoute
   AgentsIdRoute: typeof AgentsIdRoute
@@ -213,55 +116,6 @@ declare module '@tanstack/react-router' {
       path: '/tracking'
       fullPath: '/tracking'
       preLoaderRoute: typeof TrackingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/settings': {
-      id: '/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof SettingsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/reports': {
-      id: '/reports'
-      path: '/reports'
-      fullPath: '/reports'
-      preLoaderRoute: typeof ReportsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/patients': {
-      id: '/patients'
-      path: '/patients'
-      fullPath: '/patients'
-      preLoaderRoute: typeof PatientsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/hospitals': {
-      id: '/hospitals'
-      path: '/hospitals'
-      fullPath: '/hospitals'
-      preLoaderRoute: typeof HospitalsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/doctors': {
-      id: '/doctors'
-      path: '/doctors'
-      fullPath: '/doctors'
-      preLoaderRoute: typeof DoctorsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/attendance': {
-      id: '/attendance'
-      path: '/attendance'
-      fullPath: '/attendance'
-      preLoaderRoute: typeof AttendanceRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/analytics': {
-      id: '/analytics'
-      path: '/analytics'
-      fullPath: '/analytics'
-      preLoaderRoute: typeof AnalyticsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -297,13 +151,6 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AnalyticsRoute: AnalyticsRoute,
-  AttendanceRoute: AttendanceRoute,
-  DoctorsRoute: DoctorsRoute,
-  HospitalsRoute: HospitalsRoute,
-  PatientsRoute: PatientsRoute,
-  ReportsRoute: ReportsRoute,
-  SettingsRoute: SettingsRoute,
   TrackingRoute: TrackingRoute,
   TravelRoute: TravelRoute,
   AgentsIdRoute: AgentsIdRoute,
@@ -313,3 +160,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

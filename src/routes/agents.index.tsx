@@ -28,16 +28,11 @@ function AgentsPage() {
   const [status, setStatus] = useState("all");
   const [dept, setDept] = useState("all");
 
-  const filtered = AGENTS.filter((a) =>
-    (org === "all" || a.organization === org) &&
-    (region === "all" || a.region === region) &&
-    (status === "all" || a.status === status) &&
-    (dept === "all" || a.department === dept),
-  );
+  const filtered = AGENTS
 
   const cols: Column<Agent>[] = [
     {
-      key: "name", header: "Agent", sortable: true,
+      key: "name", header: "Agent Name", sortable: true,
       render: (a) => (
         <div className="flex items-center gap-3">
           <Avatar className="h-9 w-9"><AvatarImage src={a.photo} /><AvatarFallback>{a.name[0]}</AvatarFallback></Avatar>
@@ -51,23 +46,8 @@ function AgentsPage() {
     { key: "phone", header: "Mobile" },
     { key: "email", header: "Email", render: (a) => <span className="text-xs">{a.email}</span> },
     { key: "designation", header: "Designation", sortable: true },
-    { key: "manager", header: "Manager" },
-    { key: "region", header: "Region", sortable: true },
-    { key: "status", header: "Status", render: (a) => <StatusBadge status={a.status} /> },
-    { key: "lastLocationTime", header: "Last Location" },
     {
-      key: "battery", header: "Battery",
-      render: (a) => (
-        <div className="flex items-center gap-1.5">
-          <Battery className={`h-4 w-4 ${a.battery < 20 ? "text-destructive" : a.battery < 50 ? "text-warning" : "text-success"}`} />
-          <span className="text-xs">{a.battery}%</span>
-        </div>
-      ),
-    },
-    { key: "distanceToday", header: "Distance", sortable: true, render: (a) => <span>{a.distanceToday} km</span> },
-    { key: "attendance", header: "Attendance", render: (a) => <StatusBadge status={a.attendance} /> },
-    {
-      key: "actions", header: "",
+      key: "actions", header: "Actions",
       render: (a) => (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -86,7 +66,7 @@ function AgentsPage() {
   ];
 
   return (
-    <div className="space-y-6 p-4 md:p-6">
+    <div className="space-y-4 p-4 md:p-6">
       <PageHeader
         title="Agent Management"
         description="Manage and monitor all field agents."
@@ -97,52 +77,11 @@ function AgentsPage() {
         }
       />
 
-      <Card>
-        <CardContent className="p-4">
-          <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-6">
-            <div className="relative lg:col-span-2">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search agents…" className="pl-9" />
-            </div>
-            <Select value={org} onValueChange={setOrg}>
-              <SelectTrigger><SelectValue placeholder="Organization" /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Organizations</SelectItem>
-                <SelectItem value="MediCorp Pharma">MediCorp Pharma</SelectItem>
-                <SelectItem value="HealthBridge Ltd">HealthBridge Ltd</SelectItem>
-                <SelectItem value="ZenoCare">ZenoCare</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={region} onValueChange={setRegion}>
-              <SelectTrigger><SelectValue placeholder="Region" /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Regions</SelectItem>
-                {["North", "South", "East", "West", "Central"].map((r) => <SelectItem key={r} value={r}>{r}</SelectItem>)}
-              </SelectContent>
-            </Select>
-            <Select value={dept} onValueChange={setDept}>
-              <SelectTrigger><SelectValue placeholder="Department" /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Departments</SelectItem>
-                {["Sales", "Marketing", "Field Ops", "Medical"].map((r) => <SelectItem key={r} value={r}>{r}</SelectItem>)}
-              </SelectContent>
-            </Select>
-            <Select value={status} onValueChange={setStatus}>
-              <SelectTrigger><SelectValue placeholder="Status" /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                {["checked_in", "moving", "idle", "offline"].map((r) => <SelectItem key={r} value={r}>{r.replace("_", " ")}</SelectItem>)}
-              </SelectContent>
-            </Select>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
+      <div>
         <CardContent className="p-4">
           <DataTable columns={cols} data={filtered} search={search} searchFields={["name", "employeeId", "email", "phone"]} pageSize={10} />
         </CardContent>
-      </Card>
+      </div>
     </div>
   );
 }
