@@ -1,13 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Download, FileSpreadsheet, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PageHeader } from "@/components/common/page-header";
 import { DataTable, type Column } from "@/components/common/data-table";
-import { TRAVEL_REPORTS } from "@/lib/dummy-data";
+import { PageLoader } from "@/components/common/empty-state";
+import { adminApi, type TravelRow } from "@/lib/api";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/travel")({
@@ -17,13 +18,20 @@ export const Route = createFileRoute("/travel")({
 
 function TravelPage() {
   const [search, setSearch] = useState("");
-  type Row = typeof TRAVEL_REPORTS[number];
-  const cols: Column<Row>[] = [
+  const [from, setFrom] = useState("");
+  const [to, setTo] = useState("");
+  const reports = useQuery({
+    queryKey: ["travel", from, to, search],
+    queryFn: () => adminApi.travel({ from, to, search }),
+  });
+
+  const cols: Column<TravelRow>[] = [
     { key: "agent", header: "Employee", sortable: true },
+    { key: "date", header: "Date", sortable: true },
     { key: "distance", header: "Distance", sortable: true, render: (r) => `${r.distance} km` },
     { key: "travelTime", header: "Travel Time" },
-    { key: "hospitals", header: "Hospitals" },
-      {
+    { key: "status", header: "Status" },
+    {
       key: "actions", header: "Actions",
       render: () => <Button size="sm" variant="ghost"><Eye className="mr-1 h-4 w-4" />View</Button>,
     },
@@ -38,15 +46,15 @@ function TravelPage() {
           <>
             <Button variant="outline" onClick={() => toast.success("PDF export started")}><Download className="mr-2 h-4 w-4" />Export PDF</Button>
             <Button variant="outline" onClick={() => toast.success("Excel export started")}><FileSpreadsheet className="mr-2 h-4 w-4" />Export Excel</Button>
-            <Button>Generate Report</Button>
+            <Button onClick={() => void reports.refetch()}>Generate Report</Button>
           </>
         }
       />
 
       <Card>
         <CardContent className="grid gap-3 p-4 md:grid-cols-3 lg:grid-cols-6">
-          <div className="space-y-1"><label className="text-xs text-muted-foreground">From Date</label><Input type="date" /></div>
-          <div className="space-y-1"><label className="text-xs text-muted-foreground">To Date</label><Input type="date" /></div>
+          <div className="space-y-1"><label className="text-xs text-muted-foreground">From Date</label><Input type="date" value={from} onChange={(e) => setFrom(e.target.value)} /></div>
+          <div className="space-y-1"><label className="text-xs text-muted-foreground">To Date</label><Input type="date" value={to} onChange={(e) => setTo(e.target.value)} /></div>
           <div className="space-y-1">
             <label className="text-xs text-muted-foreground">Search Agent</label>
             <Input placeholder="Search…" value={search} onChange={(e) => setSearch(e.target.value)} />
@@ -54,7 +62,25 @@ function TravelPage() {
         </CardContent>
       </Card>
 
-      <Card><CardContent className="p-4"><DataTable data={TRAVEL_REPORTS} columns={cols} search={search} searchFields={["agent", "employeeId"]} pageSize={10} /></CardContent></Card>
+      <Card>
+        <CardContent className="p-4">
+          {reports.isLoading || (reports.isFetching && !reports.data) ? (
+            <PageLoader label="Loading travel report…" />
+          ) : reports.isError ? (
+            <p className="py-10 text-center text-sm text-destructive">
+              {(reports.error as Error).message || "Could not load travel report."}
+            </p>
+          ) : (
+            <DataTable
+              data={reports.data ?? []}
+              columns={cols}
+              search={search}
+              searchFields={["agent", "employeeId"]}
+              pageSize={10}
+            />
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

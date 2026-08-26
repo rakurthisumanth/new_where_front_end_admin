@@ -1,13 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import {
-  Users, UserCheck, UserX, LogIn, LogOut,
-  Hospital, Stethoscope, HeartPulse, TrendingUp, Navigation,
+  Users, UserCheck, UserX, LogIn, LogOut, Navigation,
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
 import { StatCard } from "@/components/common/stat-card";
 import { PageHeader } from "@/components/common/page-header";
-import { AGENTS, DASHBOARD_STATS } from "@/lib/dummy-data";
+import { PageLoader } from "@/components/common/empty-state";
+import { adminApi } from "@/lib/api";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -20,7 +20,23 @@ export const Route = createFileRoute("/")({
 });
 
 function Dashboard() {
-  const s = DASHBOARD_STATS;
+  const stats = useQuery({ queryKey: ["dashboard"], queryFn: adminApi.dashboard });
+  const s = stats.data ?? {
+    totalAgents: 0,
+    activeAgents: 0,
+    inactiveAgents: 0,
+    checkedInToday: 0,
+    checkedOutToday: 0,
+  };
+
+  if (stats.isLoading || (stats.isFetching && !stats.data)) {
+    return (
+      <div className="p-4 md:p-6">
+        <PageHeader title="Dashboard" description="Live overview of field operations across your organization." />
+        <PageLoader label="Loading dashboard…" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 p-4 md:p-6">

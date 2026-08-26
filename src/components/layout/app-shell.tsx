@@ -1,8 +1,8 @@
 import { Link, useRouterState, Outlet } from "@tanstack/react-router";
 import {
-  LayoutDashboard, Users, MapPin, Route as RouteIcon, Hospital, Stethoscope,
-  HeartPulse, CalendarCheck, BarChart3, FileText, Settings as SettingsIcon,
-  Bell, Search, Moon, Sun, Menu, ChevronDown, Building2, LogOut, UserCircle,
+  LayoutDashboard, Users, MapPin, Route as RouteIcon,
+  Settings as SettingsIcon,
+  Moon, Sun, Menu, LogOut, UserCircle, Eye, EyeOff, Loader2,
 } from "lucide-react";
 import { FormEvent, useEffect, useState } from "react";
 import { useTheme } from "@/lib/theme-provider";
@@ -15,8 +15,7 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { NOTIFICATIONS } from "@/lib/dummy-data";
+import { adminApi, clearSession, getStoredUser, getToken, saveSession, type AdminUser } from "@/lib/api";
 
 const NAV = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -28,12 +27,32 @@ const NAV = [
 export function AppShell() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const isNavigating = useRouterState({
+    select: (s) => Boolean(s.isLoading || ("isTransitioning" in s && Boolean((s as { isTransitioning?: boolean }).isTransitioning))),
+  });
   const { theme, toggle } = useTheme();
-  const [org, setOrg] = useState("MediCorp Pharma");
+  // Avoid flashing the login screen on refresh before localStorage is read.
+  const [authReady, setAuthReady] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
+  const [adminUser, setAdminUser] = useState<AdminUser | null>(null);
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
+  const [loginBusy, setLoginBusy] = useState(false);
+
+  useEffect(() => {
+    const token = getToken();
+    const stored = getStoredUser();
+    if (token && stored) {
+      setLoggedIn(true);
+      setAdminUser(stored);
+    } else {
+      setLoggedIn(false);
+      setAdminUser(null);
+    }
+    setAuthReady(true);
+  }, []);
 
   useEffect(() => {
     if (phone || password) {
@@ -42,24 +61,40 @@ export function AppShell() {
   }, [phone, password]);
 
   const handleLogout = () => {
+    clearSession();
     setLoggedIn(false);
+    setAdminUser(null);
     setPhone("");
     setPassword("");
     setLoginError(null);
   };
 
-  const handleLogin = (event: FormEvent<HTMLFormElement>) => {
+  const handleLogin = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const validPhone = "+91 9123456789";
-    const validPassword = "password123";
-
-    if (phone === validPhone && password === validPassword) {
+    setLoginBusy(true);
+    setLoginError(null);
+    try {
+      const result = await adminApi.login(phone, password);
+      if (result.role !== "admin") {
+        throw new Error("This account is not an admin.");
+      }
+      saveSession(result.token, result.user);
+      setAdminUser(result.user);
       setLoggedIn(true);
-      setLoginError(null);
-    } else {
-      setLoginError("Invalid phone number or password.");
+    } catch (error) {
+      setLoginError(error instanceof Error ? error.message : "Invalid phone number or password.");
+    } finally {
+      setLoginBusy(false);
     }
   };
+
+  if (!authReady) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <p className="text-sm text-muted-foreground">Loading…</p>
+      </div>
+    );
+  }
 
   if (!loggedIn) {
     return (
@@ -70,7 +105,7 @@ export function AppShell() {
               <UserCircle className="h-8 w-8" />
             </div>
             <h1 className="text-2xl font-semibold text-foreground">Admin sign in</h1>
-            <p className="mt-2 text-sm text-muted-foreground">Use the dummy credentials to continue.</p>
+            <p className="mt-2 text-sm text-muted-foreground">Sign in with your admin phone number.</p>
           </div>
 
           <form className="space-y-4" onSubmit={handleLogin}>
@@ -84,20 +119,28 @@ export function AppShell() {
             </div>
             <div>
               <label className="mb-2 block text-sm font-medium text-muted-foreground">Password</label>
-              <Input
-                type="password"
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-                placeholder="password123"
-              />
+              <div className="relative">
+                <Input
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                  placeholder="password123"
+                  className="pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-muted-foreground hover:text-foreground"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
             </div>
             {loginError ? <p className="text-sm text-destructive">{loginError}</p> : null}
-            <Button type="submit" className="w-full">Sign in</Button>
-            <div className="rounded-3xl border border-white/10 bg-slate-950/80 p-4 text-sm text-slate-400">
-              <p>Dummy credentials:</p>
-              <p className="mt-1 font-semibold text-white">Phone: +91 9123456789</p>
-              <p className="font-semibold text-white">Password: password123</p>
-            </div>
+            <Button type="submit" className="w-full" disabled={loginBusy}>
+              {loginBusy ? "Signing in…" : "Sign in"}
+            </Button>
           </form>
         </div>
       </div>
@@ -160,31 +203,6 @@ export function AppShell() {
               {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             </Button>
 
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="ghost" size="icon" className="relative">
-                  <Bell className="h-5 w-5" />
-                  <span className="absolute right-2 top-2 grid h-4 min-w-4 place-items-center rounded-full bg-destructive px-1 text-[10px] font-semibold text-destructive-foreground">
-                    {NOTIFICATIONS.length}
-                  </span>
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent align="end" className="w-80 p-0">
-                <div className="border-b p-3 text-sm font-semibold">Notifications</div>
-                <div className="max-h-80 overflow-y-auto">
-                  {NOTIFICATIONS.map((n) => (
-                    <div key={n.id} className="border-b px-3 py-2.5 last:border-0 hover:bg-accent/50">
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="text-sm font-medium">{n.title}</div>
-                        <div className="text-[11px] text-muted-foreground">{n.time}</div>
-                      </div>
-                      <div className="text-xs text-muted-foreground">{n.body}</div>
-                    </div>
-                  ))}
-                </div>
-              </PopoverContent>
-            </Popover>
-
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="gap-2 px-1.5">
@@ -193,7 +211,7 @@ export function AppShell() {
                     <AvatarFallback>AD</AvatarFallback>
                   </Avatar>
                   <div className="hidden text-left md:block">
-                    <div className="text-xs font-semibold leading-tight">Admin User</div>
+                    <div className="text-xs font-semibold leading-tight">{adminUser?.name ?? "Admin User"}</div>
                     <div className="text-[10px] leading-tight text-muted-foreground">Super Admin</div>
                   </div>
                 </Button>
@@ -210,7 +228,15 @@ export function AppShell() {
           </div>
         </header>
 
-        <main className="flex-1">
+        <main className="relative flex-1">
+          {isNavigating ? (
+            <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/70 backdrop-blur-[1px]">
+              <div className="flex flex-col items-center gap-2 rounded-xl border bg-card px-6 py-5 shadow-lg">
+                <Loader2 className="h-7 w-7 animate-spin text-primary" />
+                <p className="text-sm text-muted-foreground">Loading page…</p>
+              </div>
+            </div>
+          ) : null}
           <Outlet />
         </main>
       </div>

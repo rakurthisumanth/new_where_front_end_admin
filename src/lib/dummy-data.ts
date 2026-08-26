@@ -14,6 +14,8 @@ export interface Agent {
   status: AgentStatus;
   battery: number;
   speed: number;
+  /** Degrees 0–360; used to rotate the live bike marker. */
+  heading?: number;
   lastLocationTime: string;
   distanceToday: number;
   attendance: "present" | "absent" | "late";
